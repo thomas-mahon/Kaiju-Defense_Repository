@@ -4,29 +4,18 @@ using UnityEngine;
 
 public class InitiativeManager : MonoBehaviour
 {
-	//// Use this for initialization
-	//void Start () {
-		
-	//}
-	
-	//// Update is called once per frame
-	//void Update () {
-		
-	//}
-
-
-
     //TempCode for day 1 testing
     [SerializeField]
-    TemporaryMovement p1;
+    CustomCharacterController p1;
 
     [SerializeField]
-    TemporaryMovement p2;
+    CustomCharacterController p2;
 
-    public TemporaryMovement selectedP;
+    public CustomCharacterController selectedP;
 
     void Start()
     {
+        p2.ToggleControl(false);
         selectedP = p1;
         selectedP.ToggleControl(true);
     }
