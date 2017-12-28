@@ -9,8 +9,6 @@ using UnityStandardAssets.Utility;
 [RequireComponent(typeof(AudioSource))]
 public class CustomCharacterController : MonoBehaviour
 {
-    //To be edited as we go
-
     #region Movement
 
     [SerializeField]
@@ -278,16 +276,6 @@ public class CustomCharacterController : MonoBehaviour
         }
 
     #endregion
-
-    [SerializeField]
-    GameObject camera;
-    bool isBeingControlled;
-
-    public void ToggleControl(bool toggle)
-    {
-        camera.SetActive(toggle);
-        isBeingControlled = toggle;
-    }
 }
 
 
