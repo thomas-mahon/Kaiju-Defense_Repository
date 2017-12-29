@@ -16,7 +16,7 @@ public class Unit : MonoBehaviour
 
     public void ToggleControl(bool toggle)
     {
-        KD_CC.enabled = toggle;
+        KD_CC.isBeingControlled = toggle;
         KD_CC.playerCamera.SetActive(toggle);
     }
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class KD_CharacterController : MonoBehaviour
 {
+    public bool isBeingControlled;
+
     #region MouseFields
     public GameObject playerCamera;
     float mouseSensitivity = 1;
@@ -17,8 +19,8 @@ public class KD_CharacterController : MonoBehaviour
     #region MovementFields
     CharacterController characterController;
     float walkSpeed = 4;
-    public bool isGrounded;
     Rigidbody rigidBody;
+    float GroundCheckDistance = 0.75f;
     #endregion
 
     void Awake()
@@ -30,8 +32,12 @@ public class KD_CharacterController : MonoBehaviour
     //Use this for every frame jolly good tip tip
     void Update()
     {
-        RotateCamera();
-        MovePlayer();
+        if (isBeingControlled)
+        {
+            RotateCamera();
+            MovePlayer();
+        }
+
         GroundCheck();
     }
 
@@ -93,9 +99,9 @@ public class KD_CharacterController : MonoBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(bottom, new Vector3(0, -1, 0), out hit, 0.2f))
+        if (Physics.Raycast(bottom, new Vector3(0, -1, 0), out hit, GroundCheckDistance))
         {
-            characterController.Move(new Vector3 (0, -hit.distance, 0));
+            characterController.Move(new Vector3(0, -hit.distance, 0));
             return true;
         }
 

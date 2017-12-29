@@ -7,11 +7,11 @@ public class RoundManager : MonoBehaviour
 {
     #region Fields
     public Unit selectedUnit;
-    public Unit unitToDeselect;
     public Unit[] allUnits;
-    //CustomCharacterController[] initiativeOrder;
     public List<Unit> initiativeOrder = new List<Unit>();
     public int SelectedUnitIndex;
+
+    public List<TimeScaleAction> timeScaleOrder = new List<TimeScaleAction>();
     #endregion
 
     void Awake()
@@ -28,9 +28,24 @@ public class RoundManager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            EndUnitTurn();
+        }
+
         if (Input.GetKeyDown(KeyCode.B))
         {
             SelectNextUnit();
+        }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            MoveTimeScaleForward();
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            timeScaleOrder.Add(null);
         }
 
         if (Input.GetMouseButton(0) && Cursor.lockState != CursorLockMode.Locked)
@@ -48,8 +63,6 @@ public class RoundManager : MonoBehaviour
         {
             initiativeOrder.Add(x);
         }
-
-        //initiativeOrder.Sort((x, y) => x.InitiativeValue.CompareTo(y.InitiativeValue));
 
         initiativeOrder = initiativeOrder.OrderByDescending(x => x.InitiativeValue)
                   .ThenBy(x => x.InitiativeValue)
@@ -81,7 +94,6 @@ public class RoundManager : MonoBehaviour
     //Activate the unit to be controlled
     void ActivateNewUnit()
     {
-        //unitToDeselect.ToggleControl(false);
         selectedUnit.ToggleControl(true);
     }
 
@@ -90,8 +102,6 @@ public class RoundManager : MonoBehaviour
     void SelectNextUnit()
     {
         SelectedUnitIndex++;
-
-        //unitToDeselect = selectedUnit;
 
         if (SelectedUnitIndex >= initiativeOrder.Count)
         {
@@ -115,5 +125,25 @@ public class RoundManager : MonoBehaviour
     void EndRound()
     {
 
+    }
+
+    //get next unit, move time scale forward
+    void EndUnitTurn()
+    {
+        SelectNextUnit();
+        MoveTimeScaleForward();
+    }
+
+    //do action effect, remove that action
+    void MoveTimeScaleForward()
+    {
+        if (timeScaleOrder.Count > 0)
+        {
+            if (timeScaleOrder[0] != null)
+            {
+                timeScaleOrder[0].ActionEffect();
+            }
+            timeScaleOrder.RemoveAt(0);
+        }
     }
 }   
