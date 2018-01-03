@@ -6,12 +6,12 @@ using UnityEngine;
 public class RoundManager : MonoBehaviour
 {
     #region Fields
-    public Unit selectedUnit;
-    public Unit[] allUnits;
-    public List<Unit> initiativeOrder = new List<Unit>();
+    public Unit SelectedUnit;
+    public Unit[] AllUnits;
+    public List<Unit> InitiativeOrder = new List<Unit>();
     public int SelectedUnitIndex;
 
-    public List<TimeScaleAction> timeScaleOrder = new List<TimeScaleAction>();
+    public List<TimeScaleAction> TimeScaleOrder = new List<TimeScaleAction>();
     #endregion
 
     void Awake()
@@ -45,7 +45,7 @@ public class RoundManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.M))
         {
-            timeScaleOrder.Add(null);
+            TimeScaleOrder.Add(null);
         }
 
         if (Input.GetMouseButton(0) && Cursor.lockState != CursorLockMode.Locked)
@@ -57,14 +57,14 @@ public class RoundManager : MonoBehaviour
     //Begin the inital round and set up, then call startRound
     void StartBattle()
     {
-        allUnits = FindObjectsOfType<Unit>();
+        AllUnits = FindObjectsOfType<Unit>();
 
-        foreach (Unit x in allUnits)
+        foreach (Unit x in AllUnits)
         {
-            initiativeOrder.Add(x);
+            InitiativeOrder.Add(x);
         }
 
-        initiativeOrder = initiativeOrder.OrderByDescending(x => x.InitiativeValue)
+        InitiativeOrder = InitiativeOrder.OrderByDescending(x => x.InitiativeValue)
                   .ThenBy(x => x.InitiativeValue)
                   .ToList();
 
@@ -74,27 +74,27 @@ public class RoundManager : MonoBehaviour
     //Initial round set up
     void StartRound()
     {
-        selectedUnit = null;
+        SelectedUnit = null;
 
         SelectedUnitIndex = 0;
 
-        selectedUnit = initiativeOrder[SelectedUnitIndex];
+        SelectedUnit = InitiativeOrder[SelectedUnitIndex];
 
-        foreach (Unit x in initiativeOrder)
+        foreach (Unit x in InitiativeOrder)
         {
-            if (x != selectedUnit)
+            if (x != SelectedUnit)
             {
                 x.ToggleControl(false);
             }
         }
 
-        selectedUnit.ToggleControl(true);
+        SelectedUnit.ToggleControl(true);
     }
 
     //Activate the unit to be controlled
     void ActivateNewUnit()
     {
-        selectedUnit.ToggleControl(true);
+        SelectedUnit.ToggleControl(true);
     }
 
     //Selects next unit, if the unit can't be selected skip it, if theres nothing left
@@ -103,19 +103,22 @@ public class RoundManager : MonoBehaviour
     {
         SelectedUnitIndex++;
 
-        if (SelectedUnitIndex >= initiativeOrder.Count)
+        if (SelectedUnitIndex >= InitiativeOrder.Count)
         {
             SelectedUnitIndex = 0;
         }
 
-        selectedUnit = initiativeOrder[SelectedUnitIndex];
+        Unit[] initiativeOrder = InitiativeOrder.ToArray();
 
-        foreach (Unit x in initiativeOrder)
+        SelectedUnit = initiativeOrder[SelectedUnitIndex];
+
+        for (int i = 0; i < initiativeOrder.Length; i++)
         {
-            if (x != selectedUnit)
+            if (initiativeOrder[i] != SelectedUnit)
             {
-                x.ToggleControl(false);
+                initiativeOrder[i].ToggleControl(false);
             }
+
         }
 
         ActivateNewUnit();
@@ -137,13 +140,13 @@ public class RoundManager : MonoBehaviour
     //do action effect, remove that action
     void MoveTimeScaleForward()
     {
-        if (timeScaleOrder.Count > 0)
+        if (TimeScaleOrder.Count > 0)
         {
-            if (timeScaleOrder[0] != null)
+            if (TimeScaleOrder[0] != null)
             {
-                timeScaleOrder[0].ActionEffect();
+                TimeScaleOrder[0].ActionEffect();
             }
-            timeScaleOrder.RemoveAt(0);
+            TimeScaleOrder.RemoveAt(0);
         }
     }
 }   

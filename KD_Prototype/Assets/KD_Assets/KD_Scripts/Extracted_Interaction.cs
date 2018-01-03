@@ -10,7 +10,7 @@ public class Extracted_Interaction : MonoBehaviour
 
     public IInteractable InteractableToActivate;
 
-    public GameObject cameraToDrawFrom;
+    public GameObject CameraToDrawFrom;
 
     Vector3 endPoint;
 
@@ -39,10 +39,10 @@ public class Extracted_Interaction : MonoBehaviour
     //Checks if we are drawing to any interactables
     private void CheckForInteractables()
     {
-        endPoint = (cameraToDrawFrom.transform.forward * InteractiveRange) + cameraToDrawFrom.transform.position;
+        endPoint = (CameraToDrawFrom.transform.forward * InteractiveRange) + CameraToDrawFrom.transform.position;
 
         RaycastHit raycastHit;
-        if (Physics.Raycast(cameraToDrawFrom.transform.position, cameraToDrawFrom.transform.forward,
+        if (Physics.Raycast(CameraToDrawFrom.transform.position, CameraToDrawFrom.transform.forward,
             out raycastHit, InteractiveRange) && raycastHit.transform.gameObject.layer == 12)
         {
             InteractableToActivate = raycastHit.transform.gameObject.GetComponent<IInteractable>();
