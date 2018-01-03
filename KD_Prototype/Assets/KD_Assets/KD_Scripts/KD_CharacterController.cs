@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class KD_CharacterController : MonoBehaviour
 {
-    public bool isBeingControlled;
+    public bool IsBeingControlled;
 
     #region MouseFields
     public GameObject playerCamera;
@@ -32,7 +32,7 @@ public class KD_CharacterController : MonoBehaviour
     //Use this for every frame jolly good tip tip
     void Update()
     {
-        if (isBeingControlled)
+        if (IsBeingControlled)
         {
             RotateCamera();
             MovePlayer();

@@ -1,0 +1,94 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Shooting : MonoBehaviour {
+
+    KD_CharacterController charController;
+    ReferenceManager referenceManager;
+
+    int damage;
+    float range;
+
+	// Update is called once per frame
+	void Update () {
+        DetectAccuracy();
+        if (Input.GetButtonDown("Fire1"))
+        {
+            //Activate UI to select shot type
+            //referenceManager.SelectShotTypePanel.SetActive(true);
+            //set stuff in SelectShotTypePanel
+            Shoot(); //temp
+
+            //disable character controller
+            charController.IsBeingControlled = false;
+        }
+	}
+
+    private void DetectAccuracy()
+    {
+        int accuracy = 0;
+        int accuracyMeasurementsIncriments = 50;
+        //draw 100 raycasts in the hit zone, of the 100 add 1 to the accuracy %
+        float startX = Screen.width / 2 - (referenceManager.HitBoxImage.rectTransform.rect.width / 2);
+        float endX = Screen.width / 2 + (referenceManager.HitBoxImage.rectTransform.rect.width / 2);
+        float currentX = startX;
+        float incrimentX = Mathf.Abs(endX - startX) / accuracyMeasurementsIncriments;
+
+        float startY = Screen.height / 2 - (referenceManager.HitBoxImage.rectTransform.rect.height / 2);
+        float endY = Screen.height / 2 + (referenceManager.HitBoxImage.rectTransform.rect.height / 2);
+        float currentY = Screen.height / 2;
+        float incrimentY = Mathf.Abs(endY - startY) / accuracyMeasurementsIncriments;
+
+        //measure across X axis
+        for (int i = 0; i < accuracyMeasurementsIncriments; i++)
+        {
+            accuracy += DrawRaycast(currentX, currentY);
+            currentX += incrimentX;
+        }
+        currentX = Screen.width / 2;
+        for (int i = 0; i < accuracyMeasurementsIncriments; i++)
+        {
+            accuracy += DrawRaycast(currentX, currentY);
+            currentY += incrimentY;
+        }
+        
+    }
+
+    private int DrawRaycast(float xScreenPos, float yScreenPos)
+    {
+        RaycastHit[] hits;
+        DrawRaycast(xScreenPos, yScreenPos, out hits);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.gameObject.GetComponent<Unit>())
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private void DrawRaycast(float xScreenPos, float yScreenPos, out RaycastHit [] hits)
+    {
+        Ray ray = new Ray(Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, 0f)), Camera.main.transform.forward);
+        hits = Physics.RaycastAll(ray, range, layerMask: LayerMask.NameToLayer("Default"), queryTriggerInteraction: QueryTriggerInteraction.Ignore);
+    }
+
+
+    public void Shoot()
+    {
+        RaycastHit[] hits;
+        DrawRaycast(UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.xMin, referenceManager.HitBoxImage.rectTransform.rect.xMax),
+            UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.yMin, referenceManager.HitBoxImage.rectTransform.rect.yMax), out hits);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.gameObject.GetComponent<Unit>())
+            {
+                hits[i].collider.gameObject.GetComponent<IDamagable>().TakeDamage(damage);
+            }
+        }
+        
+    }
+}
