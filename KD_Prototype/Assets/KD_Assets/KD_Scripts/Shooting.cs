@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Shooting : MonoBehaviour {
+    
+    internal Weapon [] Weapons;
+    internal bool IsAiming;
+
+    Weapon currentWeapon;
 
     KD_CharacterController charController;
     ReferenceManager referenceManager;
@@ -28,7 +33,7 @@ public class Shooting : MonoBehaviour {
 
     private void DetectAccuracy()
     {
-        int accuracy = 0;
+        float accuracy = 0;
         int accuracyMeasurementsIncriments = 50;
         //draw 100 raycasts in the hit zone, of the 100 add 1 to the accuracy %
         float startX = Screen.width / 2 - (referenceManager.HitBoxImage.rectTransform.rect.width / 2);
@@ -53,7 +58,7 @@ public class Shooting : MonoBehaviour {
             accuracy += DrawRaycast(currentX, currentY);
             currentY += incrimentY;
         }
-        
+        accuracy *= currentWeapon.Accuracy / 100f;
     }
 
     private int DrawRaycast(float xScreenPos, float yScreenPos)
@@ -79,14 +84,21 @@ public class Shooting : MonoBehaviour {
 
     public void Shoot()
     {
-        RaycastHit[] hits;
-        DrawRaycast(UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.xMin, referenceManager.HitBoxImage.rectTransform.rect.xMax),
-            UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.yMin, referenceManager.HitBoxImage.rectTransform.rect.yMax), out hits);
-        for (int i = 0; i < hits.Length; i++)
+        for (int j = 0; j < currentWeapon.ShotCount; j++)
         {
-            if (hits[i].collider.gameObject.GetComponent<Unit>())
+            RaycastHit[] hits;
+            DrawRaycast(UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.xMin, referenceManager.HitBoxImage.rectTransform.rect.xMax),
+                UnityEngine.Random.Range(referenceManager.HitBoxImage.rectTransform.rect.yMin, referenceManager.HitBoxImage.rectTransform.rect.yMax), out hits);
+            for (int i = 0; i < hits.Length; i++)
             {
-                hits[i].collider.gameObject.GetComponent<IDamagable>().TakeDamage(damage);
+                if (hits[i].collider.gameObject.GetComponent<Unit>())
+                {
+                    //random in weapon accuracy for hit calculation
+                    if (UnityEngine.Random.Range(0,100) <= currentWeapon.Accuracy)
+                    {
+                        hits[i].collider.gameObject.GetComponent<IDamagable>().TakeDamage(currentWeapon.Damage);
+                    }
+                }
             }
         }
         

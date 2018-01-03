@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 { 
-    [SerializeField]
+    [HideInInspector]
     KD_CharacterController KD_CC;
 
     public int InitiativeValue;
