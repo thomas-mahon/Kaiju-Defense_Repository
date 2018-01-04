@@ -4,19 +4,10 @@ using UnityEngine;
 
 public class TimeScaleAction : MonoBehaviour
 {
-    string Name;
-
-	// Uswe this for initialization
-	void Start ()
-    {
-		
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
+    public string actionName;
+    public int timeScaleOffSet;
+    public int timeScalePosition;
+    public int timeScalePriority;
 
     public virtual void ActionEffect()
     {

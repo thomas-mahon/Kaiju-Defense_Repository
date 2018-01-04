@@ -1,17 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class RoundManager : MonoBehaviour
 {
-    #region Fields
+    #region InitiativeFields
     public Unit SelectedUnit;
     public Unit[] AllUnits;
-    public List<Unit> InitiativeOrder = new List<Unit>();
     public int SelectedUnitIndex;
+    public Unit[] initiativeOrder;
+    #endregion
 
+    #region TimeScaleFields
     public List<TimeScaleAction> TimeScaleOrder = new List<TimeScaleAction>();
+    public int CurrentTime;
+    public TimeScaleAction[] ActionsToActivate;
     #endregion
 
     void Awake()
@@ -19,6 +24,7 @@ public class RoundManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    #region //Round Flow Methods
     // Use this for initialization
     void Start ()
     {
@@ -38,11 +44,6 @@ public class RoundManager : MonoBehaviour
             SelectNextUnit();
         }
 
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            MoveTimeScaleForward();
-        }
-
         if (Input.GetKeyDown(KeyCode.M))
         {
             TimeScaleOrder.Add(null);
@@ -59,14 +60,7 @@ public class RoundManager : MonoBehaviour
     {
         AllUnits = FindObjectsOfType<Unit>();
 
-        foreach (Unit x in AllUnits)
-        {
-            InitiativeOrder.Add(x);
-        }
-
-        InitiativeOrder = InitiativeOrder.OrderByDescending(x => x.InitiativeValue)
-                  .ThenBy(x => x.InitiativeValue)
-                  .ToList();
+        initiativeOrder = AllUnits.OrderByDescending(x => x.InitiativeValue).ToArray();
 
         StartRound();
     }
@@ -78,9 +72,9 @@ public class RoundManager : MonoBehaviour
 
         SelectedUnitIndex = 0;
 
-        SelectedUnit = InitiativeOrder[SelectedUnitIndex];
+        SelectedUnit = initiativeOrder[SelectedUnitIndex];
 
-        foreach (Unit x in InitiativeOrder)
+        foreach (Unit x in initiativeOrder)
         {
             if (x != SelectedUnit)
             {
@@ -97,18 +91,17 @@ public class RoundManager : MonoBehaviour
         SelectedUnit.ToggleControl(true);
     }
 
-    //Selects next unit, if the unit can't be selected skip it, if theres nothing left
-    //End the round
+    //Selects next unit
     void SelectNextUnit()
     {
         SelectedUnitIndex++;
 
-        if (SelectedUnitIndex >= InitiativeOrder.Count)
+        if (SelectedUnitIndex >= initiativeOrder.Length)
         {
             SelectedUnitIndex = 0;
         }
 
-        Unit[] initiativeOrder = InitiativeOrder.ToArray();
+        initiativeOrder = initiativeOrder.ToArray();
 
         SelectedUnit = initiativeOrder[SelectedUnitIndex];
 
@@ -134,19 +127,57 @@ public class RoundManager : MonoBehaviour
     void EndUnitTurn()
     {
         SelectNextUnit();
-        MoveTimeScaleForward();
     }
 
-    //do action effect, remove that action
-    void MoveTimeScaleForward()
+    #endregion
+
+    void AddAction(TimeScaleAction TSA_ToBeAdded)
     {
-        if (TimeScaleOrder.Count > 0)
+        int priorityOffset = 0;
+
+        TSA_ToBeAdded.timeScalePosition = TSA_ToBeAdded.timeScaleOffSet + CurrentTime;
+
+        foreach (TimeScaleAction x in TimeScaleOrder)
         {
-            if (TimeScaleOrder[0] != null)
+            if (x.timeScalePosition == TSA_ToBeAdded.timeScalePosition)
             {
-                TimeScaleOrder[0].ActionEffect();
+                priorityOffset++;
             }
-            TimeScaleOrder.RemoveAt(0);
         }
+
+        TSA_ToBeAdded.timeScalePriority = priorityOffset;
+
+        TimeScaleOrder.Add(TSA_ToBeAdded);
+    }
+
+    void FindNextActionsToActivate()
+    {
+        List<TimeScaleAction> QueuedActions = new List<TimeScaleAction>();
+
+        foreach (TimeScaleAction x in TimeScaleOrder)
+        {
+            if (x.timeScalePosition == CurrentTime)
+            {
+                QueuedActions.Add(x);
+            }
+        }
+
+        ActionsToActivate = QueuedActions.OrderBy(x => x.timeScalePriority).ToArray();
+    }
+
+    void ActivateActions()
+    {
+        foreach (TimeScaleAction x in ActionsToActivate)
+        {
+            x.ActionEffect();
+            // Some type of wait until the effect resolves
+        }
+
+        // Clear the ActionsToActivate array
+    }
+
+    void IncrememntTime()
+    {
+        CurrentTime++;
     }
 }   
